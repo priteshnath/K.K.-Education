@@ -1,33 +1,33 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const cors = require('cors');  // Import cors
+const connectDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
 
-// Load environment variables
-dotenv.config();
+require('dotenv').config();
 
-// Initialize Express app
 const app = express();
 
-// Middleware
-app.use(express.json()); // Parse JSON bodies
-app.use(cors());         // Enable CORS
+// Connect to MongoDB
+connectDB();
 
-// Simple route
+// Enable CORS for your frontend's origin
+app.use(cors({ origin: 'http://localhost:5173' }));
+
+// Middleware to parse JSON requests
+app.use(express.json());
+
+// Use the user routes
+app.use('/api/users', userRoutes);
+
+// Test route
 app.get('/', (req, res) => {
-  res.send('KK Education Backend is Running');
+  res.send('API is running...');
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log(err));
+// Define the server port
+const PORT = process.env.PORT || 3001;
 
-// Set the port
-const PORT = process.env.PORT || 5000;
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
